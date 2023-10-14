@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="Family chat app" content="description" />
+    <meta http-equiv="X-UA-COMPATIBLE" />
+    <meta name="robot" content="follow, index" />
+    <link rel="stylesheet" href="./QBA/css/bootstrap.css" />
+    <link rel="stylesheet" href="./styles/style.css" />
+
+    <script src="./QBA/code.jquery.com_jquery-3.7.0.js"></script>
+    <script src="./QBA/js/bootstrap.js"></script>
+    <script src="/socket.io/socket.io.js" node></script>
+
+    <title>Family Chat App</title>
+  </head>
+  <body>
+    <nav>
+      <h1>Let Familia Connect</h1>
+    </nav>
+    <section>
+      <div class="container">
+        <div class="jumbotron jumbotron-fluid">
+          <br />
+          <h1 class="display-4">Send Message</h1>
+          <br />
+          <input
+            type="text"
+            name="name"
+            id="name1"
+            class="form-control"
+            placeholder="Name"
+          />
+          <br />
+          <textarea name="text" id="text-area" cols="120" rows="8"></textarea>
+          <br />
+          <button class="btn btn-dark btn-lg" id="send">submit</button>
+        </div>
+      </div>
+      <div id="messages"></div>
+    </section>
+    <script>
+      // initialize socket.io
+      let socket = io();
+
+      let path1 = "http://localhost:3010/messages";
+      $(document).ready(function () {
+        $("#send").click(function () {
+          let name = $("#name1").val();
+          let text = $("#text-area").val();
+
+          postMessage({ name, text });
+        });
+        getMessages();
+      });
+
+      //add message to output
+      function addMessages(message) {
+        $("#messages:last-child").append(
+          `<div class='messenger'><h4>${message.name}</h4><p>${message.text}</p></div>`
+        );
+      }
+      /*function addMessages2(message) {
+        $("#messages:last-child").append(
+          `<div class='messenger2'><h4>${message.name}</h4><p>${message.text}</p></div>`
+        );
+        console.log(displayNum);
+
+        displayNum++;
+      }*/
+      //  POST function
+      function postMessage(message) {
+        $.post(path1, message);
+      }
+      //get messages from server
+      function getMessages() {
+        $.get(path1, (data) => {
+          data.forEach((message) => {
+            addMessages(message);
+          });
+        });
+      }
+
+      socket.on("message", addMessages);
+    </script>
+  </body>
+</html>
